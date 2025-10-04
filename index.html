@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Asteroid Impact Visualizer — Inicio</title>
+
+  <style>
+    /* ===== RESET ===== */
+    * { box-sizing: border-box; margin:0; padding:0; }
+    html,body{height:100%}
+    body{
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,0.04) 0, transparent 2px),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,0.03) 0, transparent 2px),
+        linear-gradient(180deg,#020416 0%, #061233 60%, #00121a 100%);
+      color:#dfefff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding-bottom:60px;
+    }
+
+    /* ===== TOPBAR ===== */
+    .topbar{
+      position:fixed;
+      top:0; left:0; right:0;
+      height:74px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 20px;
+      background:linear-gradient(180deg, rgba(5,12,30,0.85), rgba(3,6,12,0.75));
+      border-bottom:1px solid rgba(255,255,255,0.04);
+      z-index:200;
+      backdrop-filter: blur(6px);
+    }
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo {
+      width:54px;height:54px;border-radius:10px;padding:8px;background:linear-gradient(135deg,#062b6f,#003a7a);
+      display:flex;align-items:center;justify-content:center;box-shadow: 0 6px 18px rgba(0,80,170,0.12);
+      flex: 0 0 54px;
+      overflow: hidden;
+    }
+    .brand-text h1{font-size:1.05rem;color:#bfe8ff;letter-spacing:0.6px}
+    .brand-text p{font-size:0.78rem;color:#9ebed6;margin-top:2px}
+    .menu-wrap{display:flex;align-items:center;gap:12px}
+    .hamburger{
+      font-size:22px;
+      width:46px;height:46px;border-radius:10px;border:none;
+      background:linear-gradient(180deg,#072a5a,#033663);color:#dff6ff;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 18px rgba(0,90,180,0.12);
+    }
+    nav.nav {
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    nav.nav a{
+      text-decoration:none;color:#dfefff;padding:8px 12px;border-radius:8px;
+      font-weight:600;font-size:0.93rem;letter-spacing:0.2px;
+      transition: all .18s ease;
+    }
+    nav.nav a:hover{ background: rgba(11,80,150,0.15); transform: translateY(-2px); color:#bfe8ff; }
+    @media (max-width:900px){
+      nav.nav{ position: absolute; top:74px; right:18px; flex-direction:column;
+              width:220px; background:linear-gradient(180deg,#02132b,#001528); padding:10px;
+              border-radius:10px; box-shadow:0 10px 30px rgba(0,15,40,0.6); display:none; }
+      nav.nav.show{display:flex}
+    }
+
+    /* ===== HERO ===== */
+    main{ max-width:1200px; margin:110px auto 40px; padding:0 20px; }
+    .hero{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap:28px;
+      align-items:start;
+    }
+    .hero-left h2{
+      font-size:1.7rem;color:#9fe6ff;margin-bottom:12px;
+      text-shadow: 0 4px 18px rgba(0,150,255,0.08);
+    }
+    .hero-left p{ color:#cfeeff; margin-bottom:18px; line-height:1.5; }
+    .hotspots{ display:flex; flex-wrap:wrap; gap:10px; }
+    .hotspot{
+      background: linear-gradient(135deg, rgba(4,64,110,0.22), rgba(0,128,200,0.08));
+      color:#e6f8ff; border:1px solid rgba(0,160,255,0.12);
+      padding:10px 14px;border-radius:999px; cursor:pointer; font-weight:700;
+      transition: transform .18s, box-shadow .18s;
+      box-shadow: 0 6px 18px rgba(0,110,200,0.06);
+    }
+    .hotspot:hover{ transform: translateY(-4px) scale(1.02); box-shadow:0 18px 40px rgba(0,160,255,0.12) }
+
+    .hero-right{
+      display:flex; flex-direction:column; align-items:center; gap:12px;
+    }
+    .threebox{
+      height:300px;border-radius:14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      display:flex;align-items:center;justify-content:center; color:#9fbfdf;
+      border:1px solid rgba(60,140,220,0.08);
+      box-shadow: 0 10px 30px rgba(0,80,160,0.07);
+      position:relative; overflow:hidden;
+    }
+    .registro {
+      margin-top:12px;
+      text-align:center;
+    }
+    .registro form { display:flex; flex-direction:column; gap:8px; align-items:center; }
+    .registro input[type="text"],
+    .registro input[type="email"]{
+      width: 86%;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+      color: inherit;
+    }
+    .registro button {
+      padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:700;
+      background:linear-gradient(90deg,#00b7ff,#1e90ff); color:#001528;
+      transition: transform .12s ease;
+    }
+    .registro button:hover { transform: translateY(-3px); }
+    .resultado {
+      margin-top:10px;color:#bfe8ff;font-weight:600;display:none;
+      background: rgba(255,255,255,0.02); padding:10px; border-radius:8px;
+    }
+
+    /* ===== CARDS ===== */
+    .cards{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:18px;
+      margin-top:26px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;padding:18px;border:1px solid rgba(90,160,240,0.06);
+      box-shadow: 0 8px 30px rgba(0,60,120,0.06); transition: transform .18s, box-shadow .18s;
+    }
+    .card:hover{ transform: translateY(-8px); box-shadow:0 20px 45px rgba(0,80,160,0.12) }
+    .card h3{ color:#9fe6ff; margin-bottom:8px }
+
+    /* footer */
+    .footer{
+      position:fixed;left:0;right:0;bottom:0;padding:12px 20px;background:linear-gradient(180deg,#00111f,#000814);
+      border-top:1px solid rgba(255,255,255,0.03); text-align:center;color:#9ebed6;font-size:13px;
+    }
+
+    @media (max-width:980px){
+      .hero{ grid-template-columns: 1fr 320px; }
+      main{ margin-top:100px }
+    }
+    @media (max-width:760px){
+      .hero{ grid-template-columns: 1fr; }
+      .cards{ grid-template-columns: 1fr; }
+      .threebox{ height:220px }
+      .brand-text h1{ font-size:1rem }
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar" role="banner">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">
+      <img src="/img/nasalogo.jpg" alt="Logo NASA" style="width:36px;height:36px; object-fit:cover;">
+    </div>
+    <div class="brand-text">
+      <h1>Asteroid Impact Visualizer</h1>
+      <p class="subtitle">Impactor-2025</p>
+    </div>
+  </div>
+
+  <div class="menu-wrap">
+    <button class="hamburger" id="hamburger" aria-label="Abrir menú">☰</button>
+    <nav id="navMenu" class="nav" aria-label="Navegación principal">
+      <a href="index.html">Inicio</a>
+      <a href="simulacion.html">Simulación</a>
+      <a href="datos.html">Datos</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-left">
+      <h2 id="hero-title">🌍 Resumen del Desafío</h2>
+      <p>
+        La amenaza de asteroides cercanos a la Tierra, como <strong>Impactor-2025</strong>,
+        nos reta a crear simulaciones, calcular consecuencias y explorar estrategias de mitigación.
+        Esta plataforma usa datos públicos para visualizar riesgos y probar soluciones.
+      </p>
+
+      <div class="hotspots" role="list">
+        <button class="hotspot" data-target="neo" role="listitem">📊 NEO Data</button>
+        <button class="hotspot" data-target="impact" role="listitem">💥 Impact Physics</button>
+        <button class="hotspot" data-target="mitigation" role="listitem">🛡️ Mitigation</button>
+      </div>
+
+      <div id="hotspotInfo" style="margin-top:12px; color:#bfe8ff; font-weight:600; line-height:1.4;"></div>
+    </div>
+
+    <div class="hero-right">
+      <div class="threebox" aria-label="Vista logo NASA">
+        <img src="/img/nasalogo.jpg" alt="Logo NASA" style="width:110px;height:110px;border-radius:50%;object-fit:cover;">
+      </div>
+
+      <div class="registro" aria-label="Registro usuario">
+        <form id="registroForm">
+          <input type="text" id="nombre" placeholder="Tu nombre" required />
+          <input type="email" id="correo" placeholder="Tu correo" required />
+          <button type="submit">Registrarme</button>
+        </form>
+        <div id="resultado" class="resultado" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cards" aria-label="Secciones destacadas">
+    <article class="card">
+      <h3>🌌 Exploración</h3>
+      <p>Analiza datos reales de asteroides cercanos a la Tierra con gráficas y visualizaciones interactivas.</p>
+    </article>
+
+    <article class="card">
+      <h3>⚡ Simulación</h3>
+      <p>Simula trayectorias y calcula energía de impacto, zonas afectadas y escenarios de mitigación.</p>
+    </article>
+
+    <article class="card">
+      <h3>📈 Estrategias</h3>
+      <p>Visualiza y compara estrategias de defensa: impactores cinéticos, desvíos y planes de respuesta.</p>
+    </article>
+  </section>
+</main>
+
+<footer class="footer" role="contentinfo">
+  <small>🚀 Prototype • Datos: NASA &amp; USGS • Educativo</small>
+</footer>
+
+<script>
+  // menú hamburguesa
+  const hamburger = document.getElementById('hamburger');
+  const navMenu = document.getElementById('navMenu');
+  hamburger.addEventListener('click', () => navMenu.classList.toggle('show'));
+
+  // hotspots interaction
+  const hotspotInfo = document.getElementById('hotspotInfo');
+  document.querySelectorAll('.hotspot').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const t = btn.dataset.target;
+      const texts = {
+        neo: '📊 NEO Data: Traza objetos cercanos a la Tierra — tamaño, velocidad y fecha de acercamiento (fuente: NASA NEO API).',
+        impact: '💥 Impact Physics: Calcula energía del impacto, tamaño de cráter estimado y magnitud sísmica aproximada.',
+        mitigation: '🛡️ Mitigation: Explora estrategias como impactores cinéticos, desviación y respuestas de emergencia.'
+      };
+      hotspotInfo.textContent = texts[t];
+    });
+  });
+
+  // Registro
+  const registroForm = document.getElementById('registroForm');
+  const resultado = document.getElementById('resultado');
+
+  const existingName = localStorage.getItem('aiv_name');
+  if (existingName) {
+    resultado.innerHTML = `✨ Hola <strong>${existingName}</strong>, ya estás registrado.`;
+    resultado.style.display = 'block';
+  }
+
+  registroForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('nombre').value.trim();
+    const correo = document.getElementById('correo').value.trim();
+
+    if (!nombre || !correo) {
+      resultado.textContent = 'Por favor completa nombre y correo.';
+      resultado.style.display = 'block';
+      return;
+    }
+
+    localStorage.setItem('aiv_name', nombre);
+    localStorage.setItem('aiv_email', correo);
+
+    resultado.innerHTML = `✅ ¡Listo, <strong>${nombre}</strong>! Te registraste con <strong>${correo}</strong>.`;
+    resultado.style.display = 'block';
+    registroForm.reset();
+  });
+</script>
+</body>
+</html>

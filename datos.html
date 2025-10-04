@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Asteroid Impact Visualizer — Datos</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- ===== Estilos idénticos al index ===== -->
+  <style>
+    /* ===== RESET ===== */
+    * { box-sizing: border-box; margin:0; padding:0; }
+    html,body{height:100%}
+    body{
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,0.04) 0, transparent 2px),
+        radial-gradient(circle at 80% 30%, rgba(255,255,255,0.03) 0, transparent 2px),
+        linear-gradient(180deg,#020416 0%, #061233 60%, #00121a 100%);
+      color:#dfefff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding-bottom:60px;
+    }
+
+    /* ===== TOPBAR ===== */
+    .topbar{
+      position:fixed; top:0; left:0; right:0; height:74px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:12px 20px;
+      background:linear-gradient(180deg, rgba(5,12,30,0.85), rgba(3,6,12,0.75));
+      border-bottom:1px solid rgba(255,255,255,0.04);
+      z-index:200;
+      backdrop-filter: blur(6px);
+    }
+
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo {
+      width:54px;height:54px;border-radius:10px;padding:8px;
+      background:linear-gradient(135deg,#062b6f,#003a7a);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow: 0 6px 18px rgba(0,80,170,0.12);
+      flex: 0 0 54px; overflow: hidden;
+    }
+    .logo svg{width:36px;height:36px;filter: drop-shadow(0 4px 12px rgba(0,160,255,0.12));}
+    .brand-text h1{font-size:1.05rem;color:#bfe8ff;letter-spacing:0.6px}
+    .brand-text p{font-size:0.78rem;color:#9ebed6;margin-top:2px}
+
+    .menu-wrap{display:flex;align-items:center;gap:12px}
+    .hamburger{
+      font-size:22px;width:46px;height:46px;border-radius:10px;border:none;
+      background:linear-gradient(180deg,#072a5a,#033663);color:#dff6ff;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 18px rgba(0,90,180,0.12);
+    }
+
+    nav.nav {
+      display:flex; gap:12px; align-items:center;
+    }
+    nav.nav a{
+      text-decoration:none;color:#dfefff;padding:8px 12px;border-radius:8px;
+      font-weight:600;font-size:0.93rem;letter-spacing:0.2px;
+      transition: all .18s ease;
+    }
+    nav.nav a:hover{ background: rgba(11,80,150,0.15); transform: translateY(-2px); color:#bfe8ff; }
+
+    @media (max-width:900px){
+      nav.nav{ position:absolute; top:74px; right:18px; flex-direction:column;
+              width:220px; background:linear-gradient(180deg,#02132b,#001528);
+              padding:10px; border-radius:10px; box-shadow:0 10px 30px rgba(0,15,40,0.6); display:none;}
+      nav.nav.show{display:flex}
+    }
+
+    main{ max-width:1200px; margin:110px auto 40px; padding:0 20px; }
+
+    h2,h3{ color:#9fe6ff; margin-bottom:10px; }
+
+    /* Tabla estilo oscuro */
+    .tabla-datos{
+      width:100%; border-collapse:collapse; margin-top:1rem;
+      background: rgba(255,255,255,0.03); border-radius:10px;
+      overflow:hidden; box-shadow: 0 6px 18px rgba(0,120,255,0.06);
+    }
+    .tabla-datos th, .tabla-datos td{
+      padding:10px; text-align:center;
+    }
+    .tabla-datos th{
+      background: rgba(0,120,255,0.2); color:#bfe8ff; font-weight:600;
+    }
+    .tabla-datos tr:nth-child(even){ background: rgba(0,120,255,0.05); }
+
+    /* Gráfica canvas */
+    canvas#chartVelocidad{
+      margin-top:1.5rem; background: rgba(255,255,255,0.03);
+      border-radius:12px; padding:10px;
+      box-shadow:0 6px 18px rgba(0,120,255,0.06);
+    }
+
+    .footer{
+      position:fixed;left:0;right:0;bottom:0;padding:12px 20px;
+      background:linear-gradient(180deg,#00111f,#000814);
+      border-top:1px solid rgba(255,255,255,0.03);
+      text-align:center;color:#9ebed6;font-size:13px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <defs>
+            <radialGradient id="g" cx="30%" cy="25%">
+              <stop offset="0%" stop-color="#9fe6ff"/>
+              <stop offset="60%" stop-color="#0a5fb0"/>
+              <stop offset="100%" stop-color="#001a3a"/>
+            </radialGradient>
+          </defs>
+          <rect width="64" height="64" rx="12" fill="url(#g)"/>
+          <circle cx="22" cy="28" r="6" fill="#fff" opacity="0.12"/>
+          <path d="M40 18c6 6 6 16 0 22" stroke="#fff" stroke-opacity="0.12" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Asteroid Impact Visualizer</h1>
+        <p class="subtitle">Datos</p>
+      </div>
+    </div>
+
+    <div class="menu-wrap">
+      <button class="hamburger" id="hamburger" aria-label="Abrir menú">☰</button>
+      <nav id="navMenu" class="nav">
+        <a href="index.html">Inicio</a>
+        <a href="simulacion.html">Simulación</a>
+        <a href="datos.html" class="active">Datos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h2>📊 Datos de Asteroides Cercanos</h2>
+    <p>Tabla de NEOs (Near Earth Objects) y su información principal.</p>
+
+    <table class="tabla-datos">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Diámetro (m)</th>
+          <th>Velocidad (km/s)</th>
+          <th>Acercamiento (2025)</th>
+          <th>Potencial Peligro</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Impactor-2025</td>
+          <td>140</td>
+          <td>25.4</td>
+          <td>12 Mar 2025</td>
+          <td>Moderado</td>
+        </tr>
+        <tr>
+          <td>Apophis</td>
+          <td>370</td>
+          <td>30.7</td>
+          <td>13 Abr 2025</td>
+          <td>Alto</td>
+        </tr>
+        <tr>
+          <td>2023 PDC</td>
+          <td>120</td>
+          <td>22.1</td>
+          <td>20 May 2025</td>
+          <td>Bajo</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Velocidad de Asteroides</h3>
+    <canvas id="chartVelocidad" aria-label="Gráfica de velocidad de asteroides"></canvas>
+  </main>
+
+  <footer class="footer">
+    <small>🚀 Prototype • Datos: NASA &amp; USGS • Educativo</small>
+  </footer>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('navMenu');
+    hamburger.addEventListener('click', () => navMenu.classList.toggle('show'));
+
+    // Chart.js: barras solo azules
+    const ctx = document.getElementById('chartVelocidad').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Impactor-2025','Apophis','2023 PDC'],
+        datasets:[{
+          label:'Velocidad (km/s)',
+          data:[25.4,30.7,22.1],
+          backgroundColor:['#66b3ff','#3399ff','#0066cc'],
+          borderRadius:8
+        }]
+      },
+      options:{
+        plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label: ctx => `${ctx.dataset.label}: ${ctx.raw} km/s` } } },
+        scales:{
+          y:{ beginAtZero:true, title:{ display:true, text:'Velocidad (km/s)' } },
+          x:{ title:{ display:true, text:'Asteroide' } }
+        },
+        animation:{ duration:1200, easing:'easeOutQuart' }
+      }
+    });
+  </script>
+</body>
+</html>
